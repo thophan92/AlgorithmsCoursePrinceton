@@ -1,17 +1,14 @@
-package PartOne.Assignment.Week1;
-import edu.princeton.cs.algs4.StdRandom;
-import edu.princeton.cs.algs4.StdStats;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
     private WeightedQuickUnionUF uf;
     private int size;
     private int count = 0;
-    boolean[][] grid;
+    private boolean[][] grid;
     // creates n-by-n grid, with all sites initially blocked
     public Percolation(int n) {
         if (n > 0) {
-            uf = new WeightedQuickUnionUF(n^2 + 2);
+            uf = new WeightedQuickUnionUF((int) Math.pow(n, 2) + 2);
             size = n;
             grid = new boolean[n][n];
             for (int i = 0; i < n; i++) {
@@ -21,7 +18,7 @@ public class Percolation {
             }
             for (int i = 1; i <= size; i++) {
                 uf.union(0, i); // top
-                uf.union(n^2 + 1, n*(n-1) + i); // bottom
+                uf.union((int) Math.pow(n, 2) + 1, n * (n-1) + i); // bottom
             }
         } else {
             throw new IllegalArgumentException();
@@ -34,23 +31,23 @@ public class Percolation {
             grid[row-1][col-1] = true;
             count++;
             if (isTop(row, col)) {
-                if (isOpen(row + 1, col)) {
-                    uf.union(toInt(row, col), toInt(row+1, col));
-                }
-            }
-            if (isBottom(row, col)) {
                 if (isOpen(row - 1, col)) {
                     uf.union(toInt(row, col), toInt(row - 1, col));
                 }
             }
+            if (isBottom(row, col)) {
+                if (isOpen(row + 1, col)) {
+                    uf.union(toInt(row, col), toInt(row + 1, col));
+                }
+            }
             if (isLeft(row, col)) {
                 if (isOpen(row, col -1)) {
-                    uf.union(toInt(row, col), toInt(row, col-1));
+                    uf.union(toInt(row, col), toInt(row, col - 1));
                 }
             }
             if (isRight(row, col)) {
                 if (isOpen(row, col+1)) {
-                    uf.union(toInt(row, col), toInt(row, col+1));
+                    uf.union(toInt(row, col), toInt(row, col + 1));
                 }
             }
         }
@@ -106,8 +103,8 @@ public class Percolation {
     private int toInt(int row, int col) {
         return (row - 1) * size + col;
     }
+
     // test client (optional)
     public static void main(String[] args) {
-
     }
 }
