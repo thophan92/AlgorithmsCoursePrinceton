@@ -1,9 +1,11 @@
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
+    private static final int TOP = 0;
     private WeightedQuickUnionUF uf;
     private int size;
     private int count = 0;
+    private int bottom;
     private boolean[][] grid;
     // creates n-by-n grid, with all sites initially blocked
     public Percolation(int n) {
@@ -11,14 +13,11 @@ public class Percolation {
             uf = new WeightedQuickUnionUF((int) Math.pow(n, 2) + 2);
             size = n;
             grid = new boolean[n][n];
+            bottom = n * n + 1;
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
                     grid[i][j] = false; // default value
                 }
-            }
-            for (int i = 1; i <= size; i++) {
-                uf.union(0, i); // top
-                uf.union((int) Math.pow(n, 2) + 1, n * (n-1) + i); // bottom
             }
         } else {
             throw new IllegalArgumentException();
@@ -27,9 +26,18 @@ public class Percolation {
 
     // opens the site (row, col) if it is not open already
     public void open(int row, int col) {
+        if (!isInGrid(row, col)) {
+            throw new IllegalArgumentException("out of grid");
+        }
         if (!isOpen(row, col)) {
             grid[row-1][col-1] = true;
             count++;
+            if (row == 1) {
+                uf.union(toInt(row, col), TOP);
+            }
+            if (row == size) {
+                uf.union(toInt(row, col), bottom);
+            }
             if (isTop(row, col)) {
                 if (isOpen(row - 1, col)) {
                     uf.union(toInt(row, col), toInt(row - 1, col));
@@ -63,6 +71,9 @@ public class Percolation {
 
     // is the site (row, col) full?
     public boolean isFull(int row, int col) {
+        if (!isInGrid(row, col)) {
+            throw new IllegalArgumentException("out of grid");
+        }
         return uf.find(0) == uf.find(toInt(row, col));
     }
 
@@ -73,7 +84,7 @@ public class Percolation {
 
     // does the system percolate?
     public boolean percolates() {
-        return uf.find(0) == uf.find(size*size + 1);
+        return uf.find(TOP) == uf.find(bottom);
     }
 
     private boolean isLeft(int row, int col) {
@@ -106,5 +117,7 @@ public class Percolation {
 
     // test client (optional)
     public static void main(String[] args) {
+        Percolation per = new Percolation(10);
+        per.isFull(-1, 5);
     }
 }

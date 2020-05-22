@@ -4,25 +4,27 @@ public class PercolationStats {
     private static final double CONFIDENCE_95 = 1.96;
     private int size;
     private double[] times;
-    private int count;
-    private int random;
+    private int numberOfExperiments;
+    private int randomNumber;
     // perform independent trials on an n-by-n grid
     public PercolationStats(int n, int trials) {
         if (n > 0 && trials > 0) {
             size = n;
             times = new double[trials];
-            count = 0;
+            numberOfExperiments = trials;
+            int count = 0;
             Percolation per = new Percolation(n);
             for (int i = 0; i < trials; i++) {
                 while (!per.percolates()) {
-                    random = StdRandom.uniform(1, n*n + 1);
-                    while (!per.isOpen(toRow(random), toCol(random))) {
-                        random = StdRandom.uniform(n*n) + 1;
+                    randomNumber = StdRandom.uniform(1, n*n + 1);
+                    while (!per.isOpen(toRow(randomNumber), toCol(randomNumber))) {
+                        randomNumber = StdRandom.uniform(n*n) + 1;
                     }
-                    per.open(toRow(random), toCol(random));
+                    per.open(toRow(randomNumber), toCol(randomNumber));
                     count++;
                 }
-                times[i] = (double) count /  (double) (n * n);
+                double fraction = (double) count / (n * n);
+                times[i] = fraction;
             }
         } else {
             throw new IllegalArgumentException("wrong input");
@@ -41,12 +43,12 @@ public class PercolationStats {
 
     // low endpoint of 95% confidence interval
     public double confidenceLo() {
-        return mean() - CONFIDENCE_95 * stddev() / times.length;
+        return mean() - CONFIDENCE_95 * stddev() / Math.sqrt(numberOfExperiments);
     }
 
     // high endpoint of 95% confidence interval
     public double confidenceHi() {
-        return mean() + CONFIDENCE_95 * stddev() / times.length;
+        return mean() + CONFIDENCE_95 * stddev() / Math.sqrt(numberOfExperiments);
     }
 
     private int toRow(int num) {
@@ -60,9 +62,10 @@ public class PercolationStats {
     private int toCol(int random) {
         return random % size + 1;
     }
-    // test client (see below)
-    public static void main(String[] args) {
-        System.out.println("for testing");
-    }
 
+    // test client (optional)
+    public static void main(String[] args) {
+        PercolationStats stats = new PercolationStats(3, 4);
+        stats.mean();
+    }
 }
