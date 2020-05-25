@@ -1,8 +1,11 @@
+package PartOne.Assignment.Week1;
+
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
     private static final int TOP = 0;
     private WeightedQuickUnionUF uf;
+    private WeightedQuickUnionUF fullness;
     private int size;
     private int count = 0;
     private int bottom;
@@ -11,14 +14,10 @@ public class Percolation {
     public Percolation(int n) {
         if (n > 0) {
             uf = new WeightedQuickUnionUF((int) Math.pow(n, 2) + 2);
+            fullness = new WeightedQuickUnionUF((int) Math.pow(n, 2) + 1);
             size = n;
             grid = new boolean[n][n];
             bottom = n * n + 1;
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    grid[i][j] = false; // default value
-                }
-            }
         } else {
             throw new IllegalArgumentException();
         }
@@ -27,35 +26,45 @@ public class Percolation {
     // opens the site (row, col) if it is not open already
     public void open(int row, int col) {
         if (!isInGrid(row, col)) {
-            throw new IllegalArgumentException("out of grid");
+            throw new IllegalArgumentException();
         }
-        if (!isOpen(row, col)) {
+        if (!grid[row-1][col-1]) {
             grid[row-1][col-1] = true;
             count++;
+            int pos = toInt(row, col);
             if (row == 1) {
-                uf.union(toInt(row, col), TOP);
+                uf.union(pos, TOP);
+                fullness.union(pos, TOP);
             }
             if (row == size) {
-                uf.union(toInt(row, col), bottom);
+                uf.union(pos, bottom);
             }
             if (isTop(row, col)) {
                 if (isOpen(row - 1, col)) {
-                    uf.union(toInt(row, col), toInt(row - 1, col));
+                    int nextPos = toInt(row - 1, col);
+                    uf.union(pos, nextPos);
+                    fullness.union(pos, nextPos);
                 }
             }
             if (isBottom(row, col)) {
                 if (isOpen(row + 1, col)) {
-                    uf.union(toInt(row, col), toInt(row + 1, col));
+                    int nextPos = toInt(row + 1, col);
+                    uf.union(pos, nextPos);
+                    fullness.union(pos, nextPos);
                 }
             }
             if (isLeft(row, col)) {
                 if (isOpen(row, col -1)) {
-                    uf.union(toInt(row, col), toInt(row, col - 1));
+                    int nextPos = toInt(row, col - 1);
+                    uf.union(pos, nextPos);
+                    fullness.union(pos, nextPos);
                 }
             }
             if (isRight(row, col)) {
                 if (isOpen(row, col+1)) {
-                    uf.union(toInt(row, col), toInt(row, col + 1));
+                    int nextPos = toInt(row, col + 1);
+                    uf.union(pos, nextPos);
+                    fullness.union(pos, nextPos);
                 }
             }
         }
@@ -63,10 +72,10 @@ public class Percolation {
 
     // is the site (row, col) open?
     public boolean isOpen(int row, int col) {
-        if (isInGrid(row, col)) {
-            return grid[row-1][col-1];
+        if (!isInGrid(row, col)) {
+            throw new IllegalArgumentException();
         }
-        return false;
+        return grid[row-1][col-1];
     }
 
     // is the site (row, col) full?
@@ -74,7 +83,7 @@ public class Percolation {
         if (!isInGrid(row, col)) {
             throw new IllegalArgumentException("out of grid");
         }
-        return uf.find(0) == uf.find(toInt(row, col));
+        return fullness.find(0) == fullness.find(toInt(row, col));
     }
 
     // returns the number of open sites
@@ -104,11 +113,7 @@ public class Percolation {
     }
 
     private boolean isInGrid(int row, int col) {
-        if (row >= 1 && row <= size && col >= 1 && col <= size) {
-            return true;
-        } else {
-            throw new IllegalArgumentException("Out of Grid");
-        }
+        return row >= 1 && row <= size && col >= 1 && col <= size;
     }
 
     private int toInt(int row, int col) {

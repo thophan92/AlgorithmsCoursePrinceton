@@ -1,7 +1,7 @@
-/******************************************************************************
- *  Compilation:  javac PercolationVisualizer.java
- *  Execution:    java PercolationVisualizer input.txt
- *  Dependencies: Percolation.java
+package PartOne.Assignment.Week1; /******************************************************************************
+ *  Compilation:  javac PartOne.Assignment.Week1.PercolationVisualizer.java
+ *  Execution:    java PartOne.Assignment.Week1.PercolationVisualizer input.txt
+ *  Dependencies: PartOne.Assignment.Week1.Percolation.java
  *
  *  This program takes the name of a file as a command-line argument.
  *  From that file, it
@@ -16,6 +16,7 @@
  *
  ******************************************************************************/
 
+import PartOne.Assignment.Week1.Percolation;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdDraw;
 
